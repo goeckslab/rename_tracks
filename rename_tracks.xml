@@ -1,0 +1,61 @@
+<tool id="rename_tracks" name="rename the tracks" version="1.0">
+<description>Rename the scaffold names in the custom track files</description>
+    <requirements>
+        <requirement type="package" version="1.2">samtools</requirement>
+    </requirements>
+    <stdio>
+        <exit_code range="1:" />
+    </stdio>
+    <command><![CDATA[
+        python $__tool_directory__/rename_tracks.py $input $mapping $format $output
+    ]]></command>
+    <inputs>
+        <param name="input" type="data" format="gff3,gtf,bed,bam" label="Custom track file" />
+        <param name="format" type="select" label="Select the format of your custom track file">
+            <option value="bed">BED</option>
+            <option value="gff3">GFF3</option>
+            <option value="gtf">GTF</option>
+            <option value="bam">BAM</option>
+        </param>
+        <param name="mapping" type="data" format="csv" label="Provide the name mapping file from 'renamed the scaffolds' tool"/>
+
+    </inputs>
+    <outputs>
+        <data name="output" format_source="input" label="${tool.name} on ${on_string}: renamed_track" />
+    </outputs>
+    <tests>
+        <test>
+            <!-- Test with GFF3 -->
+            <param name="input" value="Augustus.gff3" />
+            <param name="format" value="gff3" />
+            <param name="mapping" value="name_mapping.csv" />
+            <output name="output" file="rename_Augustus.gff3"/>
+        </test>
+        <test>
+            <!-- Test with BED -->
+            <param name="input" value="TrfBig.bed" />
+            <param name="format" value="bed" />
+            <param name="mapping" value="name_mapping.csv" />
+            <output name="output" file="rename_TrfBig.bed"/>
+        </test>
+        <test>
+            <!-- Test with GTF -->
+            <param name="input" value="StringTie_assembled_transcripts.gtf" />
+            <param name="format" value="gtf" />
+            <param name="mapping" value="name_mapping.csv" />
+            <output name="output" file="rename_StringTie.gtf" />
+        </test>
+        <test>
+            <!-- Test with BAM -->
+            <param name="input" value="HISAT.bam" />
+            <param name="format" value="bam" />
+            <param name="mapping" value="name_mapping.csv" />
+            <output name="output" file="rename_HISAT.bam" />
+        </test>
+    </tests>
+    <help><![CDATA[
+    This tool is to rename scaffolds in the custom track files, so that the tracks use the same scaffold names as the reference genome renamed by "rename the scaffolds" tool
+    ]]></help>
+    <citations>
+    </citations>
+</tool>

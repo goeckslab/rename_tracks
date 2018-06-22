@@ -1,0 +1,6 @@
+categories: [Text Manipulation]
+description: Wrapper for the program which renames the scaffolds in custom track files
+homepage_url: 'https://github.com/Yating-L/rename_tracks'
+long_description: This tool is to rename scaffolds in custom track files, so that the tracks use the same scaffold names as the reference genome renamed by rename the scaffolds tool 
+name: rename_tracks
+owner: yating-l
