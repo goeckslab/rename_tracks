@@ -6,6 +6,7 @@ Rename the custom evidence tracks so that the tracks use the same sequence names
 import sys
 import csv
 import subprocess
+import tempfile
 
 def rename_interval(inputFile, nameDict, renamedFile):
     writer = open(renamedFile, 'w')
@@ -29,6 +30,18 @@ def rename_bam(inputFile, nameDict, renamedFile):
     reheader = subprocess.Popen(array_call, stdin=header.stdout, stdout=subprocess.PIPE)
     out = open(renamedFile, 'w')
     subprocess.Popen(['samtools', 'reheader', '-', inputFile], stdin=reheader.stdout, stdout=out)
+
+def rename_bigwig(inputFile, renamedReference, nameDict, renamedFile):
+    bedGraphFile = tempfile.NamedTemporaryFile(bufsize=0)
+    chrom_sizes = tempfile.NamedTemporaryFile(bufsize=0)
+    sorted_bedGraphFile = tempfile.NamedTemporaryFile(bufsize=0)
+    renamed_sorted_bedGraphFile = tempfile.NamedTemporaryFile(bufsize=0)
+
+    subprocess.call(['bigWigToBedGraph', inputFile, bedGraphFile.name])
+    subprocess.call(['faSize', '-detailed', '-tab', renamedReference], stdout=chrom_sizes)
+    subprocess.call(['sort', '-k1,1', '-k2,2n', bedGraphFile.name], stdout=sorted_bedGraphFile)
+    rename_interval(sorted_bedGraphFile.name, nameDict, renamed_sorted_bedGraphFile.name)
+    subprocess.call(['bedGraphToBigWig', renamed_sorted_bedGraphFile.name, chrom_sizes.name, renamedFile])
    
 def getNameDict(nameMapping):
     nameDict = {}
@@ -48,6 +61,9 @@ def main():
         rename_interval(inputFile, nameDict, outputfile)
     elif inputFormat == "bam":
         rename_bam(inputFile, nameDict, outputfile)
+    elif inputFormat == "bigwig":
+        renamedReference = sys.argv[5]
+        rename_bigwig(inputFile, renamedReference, nameDict, outputfile)
 
 if __name__ == "__main__":
     main()

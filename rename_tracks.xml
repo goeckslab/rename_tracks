@@ -1,24 +1,47 @@
-<tool id="rename_tracks" name="rename the tracks" version="1.0">
-<description>Rename the scaffold names in the custom track files</description>
+<tool id="rename_tracks" name="rename the tracks" version="1.2">
+<description>a Galaxy tool to rename the scaffold names in the custom track files</description>
     <requirements>
         <requirement type="package" version="1.2">samtools</requirement>
+        <requirement type="package" version="340">ucsc_rename_bigwig</requirement>
     </requirements>
     <stdio>
         <exit_code range="1:" />
     </stdio>
     <command><![CDATA[
-        python $__tool_directory__/rename_tracks.py $input $mapping $format $output
+        python $__tool_directory__/rename_tracks.py "${format_select.input}" "${mapping}" $format_select.format "${output}"
+        #if $format_select.format == "bigwig"
+            "${format_select.reference}"
+        #end if
+
+
     ]]></command>
     <inputs>
-        <param name="input" type="data" format="gff3,gtf,bed,bam" label="Custom track file" />
-        <param name="format" type="select" label="Select the format of your custom track file">
-            <option value="bed">BED</option>
-            <option value="gff3">GFF3</option>
-            <option value="gtf">GTF</option>
-            <option value="bam">BAM</option>
-        </param>
+        <conditional name="format_select">
+            <param name="format" type="select" label="Select the format of your custom track file">
+                <option value="bed">BED</option>
+                <option value="gff3">GFF3</option>
+                <option value="gtf">GTF</option>
+                <option value="bam">BAM</option>
+                <option value="bigwig">BigWig</option>
+            </param>
+            <when value="bed">
+                <param name="input" type="data" format="bed" label="Custom track file" />
+            </when>
+            <when value="gff3">
+                <param name="input" type="data" format="gff3" label="Custom track file" />
+            </when>
+            <when value="gtf">
+                <param name="input" type="data" format="gtf" label="Custom track file" />
+            </when>
+            <when value="bam">
+                <param name="input" type="data" format="bam" label="Custom track file" />
+            </when>
+            <when value="bigwig">
+                <param name="input" type="data" format="bigwig" label="Custom track file" />
+                <param name="reference" type="data" format="fasta" label="Provide the renamed the reference file from 'renamed the scaffolds' tool" />
+            </when>
+        </conditional>
         <param name="mapping" type="data" format="csv" label="Provide the name mapping file from 'renamed the scaffolds' tool"/>
-
     </inputs>
     <outputs>
         <data name="output" format_source="input" label="${tool.name} on ${on_string}: renamed_track" />
@@ -52,9 +75,17 @@
             <param name="mapping" value="name_mapping.csv" />
             <output name="output" file="rename_HISAT.bam" />
         </test>
+        <test>
+            <!-- Test with BigWig -->
+            <param name="input" value="sequence_cov.bigwig" />
+            <param name="format" value="bigwig" />
+            <param name="mapping" value="name_mapping.csv" />
+            <param name="reference" value="renamed_reference.fasta" />
+            <output name="output" file="rename_sequence_cov.bigwig" />
+        </test>
     </tests>
     <help><![CDATA[
-    This tool is to rename scaffolds in the custom track files, so that the tracks use the same scaffold names as the reference genome renamed by "rename the scaffolds" tool
+    This tool is to rename scaffold names in the custom track files, so that the tracks use the same scaffold names as the reference genome renamed by "rename the scaffolds" tool
     ]]></help>
     <citations>
     </citations>

@@ -3,4 +3,7 @@
     <package name="samtools" version="1.2">
         <repository name="package_samtools_1_2" owner="iuc" />
     </package>
+    <package name="ucsc_rename_bigwig" version="340">
+        <repository name="package_ucsc_rename_bigwig_340" owner="yating-l" />
+    </package>
 </tool_dependency>
