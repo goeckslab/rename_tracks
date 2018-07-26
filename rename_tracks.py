@@ -14,7 +14,7 @@ def rename_interval(inputFile, nameDict, renamedFile):
         lines = f.readlines()
         for l in lines:
             if not l.startswith("#"):
-                scaffold_name = l.split()[0]
+                scaffold_name = l.split('\t')[0]
                 if scaffold_name in nameDict:
                     l = l.replace(scaffold_name, nameDict[scaffold_name])
             writer.write(l)
